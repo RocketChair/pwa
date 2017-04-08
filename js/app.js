@@ -50,6 +50,27 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
   function handleSocketMessages(wsMessage) {
     const wsMessageJSON = JSON.parse(wsMessage);
 
+    if (wsMessageJSON.type === 'tips') {
+      const {data} = wsMessageJSON.data;
+      let messageToShow;
+      switch (data) {
+        case 'TO_DARK':
+          messageToShow = 'Consider turning on light or you may come blind!';
+          break;
+        case 'TO_BRIGHT':
+          messageToShow = 'Wear sunglasses!';
+        case 'TO_HOT':
+          messageToShow = 'Consider opening window or wear bikini!';
+          break;
+        case 'TO_COLD':
+          messageToShow = 'Consider holidays on Bahama beach!';
+          break;
+        default:
+          messageToShow = 'Sorry, there is no hope for you!';
+      }
+      showPushMessage(messageToShow);
+    }
+
     if (wsMessageJSON.message === 'PING') {
       const messageToShow = 'PING';
       showPushMessage(messageToShow);
