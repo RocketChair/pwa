@@ -1,28 +1,23 @@
-const cacheName = 'PWAv9';
+const cacheName = 'PWAv12';
 const filesToCache = [
-  '/',
-  '/index.html',
-  '/js/app.js'
+  // '/',
+  // '/index.html',
+  // '/js/app.js'
 ];
 
 self.addEventListener('install', event => {
   console.log('ServiceWorker install event - skip waiting');
   event.waitUntil(self.skipWaiting());
 });
-self.addEventListener('activate', event => {
-  console.log('ServiceWorker activate event - claim');
-  event.waitUntil(self.clients.claim());
-});
 
 self.addEventListener('install', event => {
   console.log('ServiceWorker install event - cache files');
-  event.waitUntil(cacheFiles(event));
+  // event.waitUntil(cacheFiles(event));
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    self.clients.claim()
-  );
+  console.log('ServiceWorker activate event - claim');
+  event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener('fetch', event => {
@@ -35,10 +30,60 @@ self.addEventListener('fetch', event => {
   );
 });
 
-const cacheFiles = () => {
+// push support
+self.addEventListener('message', event => {
+  const {data} = event;
+  if (data.type === 'showPush') {
+    showPushNotification(data.message);
+  }
+});
+
+self.onnotificationclick = event => {
+  console.log('On notification click: ', event.notification.tag);
+  event.notification.close();
+
+  // This looks to see if the current url is already open and
+  // focuses if it is
+  event.waitUntil(
+    clients.matchAll({
+      type: "window"
+    })
+    .then(clientList => {
+      for (let i = 0; i < clientList.length; i++) {
+        const client = clientList[i];
+        console.log(client);
+        // if (client.url == '/' && 'focus' in client)
+        //   return client.focus();
+        if (client.visibilityState === 'hidden') {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(client.url);
+      }
+    }));
+};
+
+function cacheFiles() {
   return caches.open(cacheName)
     .then(cache => {
       console.log('ServiceWorker caching...');
       return cache.addAll(filesToCache);
     });
-};
+}
+
+function showPushNotification(body) {
+  self.registration.showNotification('PUSH API test', {
+    lang: 'pl',
+    body: body,
+    icon: 'launcher-icon.png',
+    actions: [
+      {
+        action: 'openapp',
+        title: 'Open app',
+        // icon: 'someicon1.png'
+      }
+    ]
+  });
+}
+
