@@ -52,34 +52,25 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
 
     if (wsMessageJSON.message === 'PING') {
       const messageToShow = 'PING';
+      showPushMessage(messageToShow);
+    }
+
+    if (wsMessageJSON.type === 'message-phone') {
+      const messageToShow = wsMessageJSON.data && wsMessageJSON.data.message;
+      showPushMessage(messageToShow);
+    }
+
+    function showPushMessage(messageToShow) {
       if (navigator.serviceWorker.controller) {
         console.log("Sending message to service worker");
         navigator.serviceWorker.controller.postMessage({
-          type: "showPush",
+          command: "showPush",
           message: messageToShow
         });
       } else {
         console.log("No active ServiceWorker to show message");
       }
-      // showPushMessage(messageToShow);
     }
-
-    // if (wsMessageJSON.type === 'message-phone') {
-    //   const messageToShow = wsMessageJSON.data && wsMessageJSON.data.message;
-    //   showPushMessage(messageToShow);
-    // }
-
-    // function showPushMessage(messageToShow) {
-    //if (navigator.serviceWorker.controller) {
-    //   console.log("Sending message to service worker");
-    //   navigator.serviceWorker.controller.postMessage({
-    //     command: "showPush",
-    //     message: messageToShow
-    //   });
-    // } else {
-    //   console.log("No active ServiceWorker to show message");
-    // }
-    // }
   }
 } else {
   console.error('ServiceWorkers not supported');
