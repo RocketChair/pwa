@@ -71,10 +71,10 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
       showPushMessage(messageToShow);
     }
 
-    // if (wsMessageJSON.message === 'PING') {
-    //   const messageToShow = 'PING';
-    //   showPushMessage(messageToShow);
-    // }
+    if (wsMessageJSON.message === 'PING') {
+      const messageToShow = 'PING';
+      showPushMessage(messageToShow);
+    }
 
     if (wsMessageJSON.type === 'message-phone') {
       const messageToShow = wsMessageJSON.data && wsMessageJSON.data.message;

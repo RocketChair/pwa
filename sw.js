@@ -1,8 +1,8 @@
 const cacheName = 'PWAv12';
 const filesToCache = [
-  // '/',
-  // '/index.html',
-  // '/js/app.js'
+  '/',
+  '/index.html',
+  '/js/app.js'
 ];
 
 self.addEventListener('install', event => {
@@ -12,7 +12,7 @@ self.addEventListener('install', event => {
 
 self.addEventListener('install', event => {
   console.log('ServiceWorker install event - cache files');
-  // event.waitUntil(cacheFiles(event));
+  event.waitUntil(cacheFiles(event));
 });
 
 // self.addEventListener('activate', event => {
@@ -20,15 +20,15 @@ self.addEventListener('install', event => {
 //   event.waitUntil(self.clients.claim());
 // });
 
-// self.addEventListener('fetch', event => {
-//   console.log('Handle new request', event.request.url);
-//   event.respondWith(
-//     caches.match(event.request)
-//       .then(response => {
-//         return response || fetch(event.request);
-//       })
-//   );
-// });
+self.addEventListener('fetch', event => {
+  console.log('Handle new request', event.request.url);
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        return response || fetch(event.request);
+      })
+  );
+});
 
 // push support
 self.addEventListener('message', event => {
