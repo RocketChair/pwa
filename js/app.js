@@ -55,7 +55,7 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
       if (navigator.serviceWorker.controller) {
         console.log("Sending message to service worker");
         navigator.serviceWorker.controller.postMessage({
-          command: "showPush",
+          type: "showPush",
           message: messageToShow
         });
       } else {
