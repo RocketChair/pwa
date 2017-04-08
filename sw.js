@@ -73,7 +73,7 @@ function cacheFiles() {
 }
 
 function showPushNotification(body) {
-  self.registration.showNotification('PUSH API test', {
+  self.registration.showNotification('New info', {
     lang: 'pl',
     body: body,
     icon: 'launcher-icon.png',
