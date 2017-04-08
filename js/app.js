@@ -75,6 +75,12 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
       const messageToShow = 'PING';
       showPushMessage(messageToShow);
     }
+    
+    if (wsMessageJSON.type === 'ALERT') {
+      const {data} = wsMessageJSON;
+      const messageToShow = data && data.message;
+      showPushMessage(messageToShow);
+    }
 
     if (wsMessageJSON.type === 'message-phone') {
       const messageToShow = wsMessageJSON.data && wsMessageJSON.data.message;
