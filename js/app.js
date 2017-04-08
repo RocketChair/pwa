@@ -51,7 +51,7 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
     const wsMessageJSON = JSON.parse(wsMessage);
 
     if (wsMessageJSON.type === 'tips') {
-      const {data} = wsMessageJSON.data;
+      const {data} = wsMessageJSON;
       let messageToShow;
       switch (data) {
         case 'TO_DARK':
@@ -71,10 +71,10 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
       showPushMessage(messageToShow);
     }
 
-    if (wsMessageJSON.message === 'PING') {
-      const messageToShow = 'PING';
-      showPushMessage(messageToShow);
-    }
+    // if (wsMessageJSON.message === 'PING') {
+    //   const messageToShow = 'PING';
+    //   showPushMessage(messageToShow);
+    // }
 
     if (wsMessageJSON.type === 'message-phone') {
       const messageToShow = wsMessageJSON.data && wsMessageJSON.data.message;
