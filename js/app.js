@@ -12,107 +12,75 @@ const movementLastData = {
 };
 
 
-if ('serviceWorker' in navigator && 'PushManager' in window) {
-  console.log('Service Worker and Push is supported');
 
-  // Push messages support
-  navigator.serviceWorker.register('sw.js')
-    .then(function(swReg) {
-      console.log('Service Worker is registered', swReg);
+if ('serviceWorker' in navigator && 'PushManager' in window) {
+  navigator.serviceWorker
+    .register('sw.js', {scope: '/'})
+    .then(swReg => {
+      console.log('ServiceWorker Registered');
       swReg.pushManager.subscribe({
         userVisibleOnly: true
       });
     })
-    .catch(function(error) {
+    .catch(error => {
       console.error('Service Worker Error', error);
     });
 
-  // websocket for communication
-  ws = new WebSocket(backendAddress);
-  ws.addEventListener('open', function (event) {});
-  ws.addEventListener('message', function (event) {
-    showPushMessage(event.data);
+  // movement support
+  window.addEventListener('devicemotion', deviceMotionHandler);
+  // check every maxMoveBreak ms if move stopped
+  setInterval(() => {
+    const now = Date.now();
+    const {isMoving, lastMove} = movementLastData;
+
+    if (isMoving && lastMove && now > lastMove + maxMoveBreak) {
+      // move stopped
+      if(movementLastData.isMoving) {
+        movementLastData.isMoving = false;
+        sendUserMovementInfo(false);
+      }
+    }
+  }, maxMoveBreak);
+
+  // socket messages support
+  wss.addEventListener('message', event => {
+    handleSocketMessages(event.data);
   });
 
-  function showPushMessage(message) {
-    if (navigator.serviceWorker.controller) {
-      console.log("Sending message to service worker");
-      navigator.serviceWorker.controller.postMessage({
-        command: "showPush",
-        message: message
-      });
-    } else {
-      console.log("No active ServiceWorker");
+  function handleSocketMessages(wsMessage) {
+    const wsMessageJSON = JSON.parse(wsMessage);
+
+    if (wsMessageJSON.message === 'PING') {
+      const messageToShow = 'PING';
+      if (navigator.serviceWorker.controller) {
+        console.log("Sending message to service worker");
+        navigator.serviceWorker.controller.postMessage({
+          command: "showPush",
+          message: messageToShow
+        });
+      } else {
+        console.log("No active ServiceWorker to show message");
+      }
+      // showPushMessage(messageToShow);
     }
+
+    // if (wsMessageJSON.type === 'message-phone') {
+    //   const messageToShow = wsMessageJSON.data && wsMessageJSON.data.message;
+    //   showPushMessage(messageToShow);
+    // }
+
+    // function showPushMessage(messageToShow) {
+    //if (navigator.serviceWorker.controller) {
+    //   console.log("Sending message to service worker");
+    //   navigator.serviceWorker.controller.postMessage({
+    //     command: "showPush",
+    //     message: messageToShow
+    //   });
+    // } else {
+    //   console.log("No active ServiceWorker to show message");
+    // }
+    // }
   }
-// if ('serviceWorker' in navigator && 'PushManager' in window) {
-//   navigator.serviceWorker
-//     .register('sw.js', {scope: '/'})
-//     .then(swReg => {
-//       console.log('ServiceWorker Registered');
-//       swReg.pushManager.subscribe({
-//         userVisibleOnly: true
-//       });
-//     })
-//     .catch(error => {
-//       console.error('Service Worker Error', error);
-//     });
-//
-//   // movement support
-//   window.addEventListener('devicemotion', deviceMotionHandler);
-//   // check every maxMoveBreak ms if move stopped
-//   setInterval(() => {
-//     const now = Date.now();
-//     const {isMoving, lastMove} = movementLastData;
-//
-//     if (isMoving && lastMove && now > lastMove + maxMoveBreak) {
-//       // move stopped
-//       if(movementLastData.isMoving) {
-//         movementLastData.isMoving = false;
-//         sendUserMovementInfo(false);
-//       }
-//     }
-//   }, maxMoveBreak);
-//
-//   // socket messages support
-//   wss.addEventListener('message', event => {
-//     handleSocketMessages(event.data);
-//   });
-//
-//   function handleSocketMessages(wsMessage) {
-//     const wsMessageJSON = JSON.parse(wsMessage);
-//
-//     if (wsMessageJSON.message === 'PING') {
-//       const messageToShow = 'PING';
-//       if (navigator.serviceWorker.controller) {
-//         console.log("Sending message to service worker");
-//         navigator.serviceWorker.controller.postMessage({
-//           command: "showPush",
-//           message: messageToShow
-//         });
-//       } else {
-//         console.log("No active ServiceWorker to show message");
-//       }
-//       // showPushMessage(messageToShow);
-//     }
-//
-//     // if (wsMessageJSON.type === 'message-phone') {
-//     //   const messageToShow = wsMessageJSON.data && wsMessageJSON.data.message;
-//     //   showPushMessage(messageToShow);
-//     // }
-//
-//     // function showPushMessage(messageToShow) {
-//     //if (navigator.serviceWorker.controller) {
-//     //   console.log("Sending message to service worker");
-//     //   navigator.serviceWorker.controller.postMessage({
-//     //     command: "showPush",
-//     //     message: messageToShow
-//     //   });
-//     // } else {
-//     //   console.log("No active ServiceWorker to show message");
-//     // }
-//     // }
-//   }
 } else {
   console.error('ServiceWorkers not supported');
 }

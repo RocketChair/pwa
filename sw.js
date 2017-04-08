@@ -15,20 +15,20 @@ self.addEventListener('install', event => {
   // event.waitUntil(cacheFiles(event));
 });
 
-self.addEventListener('activate', event => {
-  console.log('ServiceWorker activate event - claim');
-  event.waitUntil(self.clients.claim());
-});
+// self.addEventListener('activate', event => {
+//   console.log('ServiceWorker activate event - claim');
+//   event.waitUntil(self.clients.claim());
+// });
 
-self.addEventListener('fetch', event => {
-  console.log('Handle new request', event.request.url);
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        return response || fetch(event.request);
-      })
-  );
-});
+// self.addEventListener('fetch', event => {
+//   console.log('Handle new request', event.request.url);
+//   event.respondWith(
+//     caches.match(event.request)
+//       .then(response => {
+//         return response || fetch(event.request);
+//       })
+//   );
+// });
 
 // push support
 self.addEventListener('message', event => {
